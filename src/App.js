@@ -42,7 +42,14 @@ function PeopleList() {
       });
     },
     onSuccess() {
-      queryClient.invalidateQueries(["people", 1]);
+      queryClient.setQueryData(["people", 1], (oldValues) =>
+        oldValues.map((old) => {
+          if (old.url === editedPerson.url) {
+            return editedPerson;
+          }
+          return old;
+        })
+      );
     },
   });
 
