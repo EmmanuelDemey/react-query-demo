@@ -1,7 +1,7 @@
 import logo from "./logo.svg";
 import "./App.css";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const usePeople = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,15 +27,32 @@ const usePeople = () => {
 };
 
 function PeopleList() {
+  const queryClient = useQueryClient();
   const { isPending, data, next, previous } = usePeople();
   const [editedPerson, setEditedPerson] = useState();
+
+  const { isPending: isSaving, mutate } = useMutation({
+    mutationFn: (person) => {
+      return fetch("http://localhost:3000/1", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(person),
+      });
+    },
+    onSuccess() {
+      queryClient.invalidateQueries(["people", 1]);
+    },
+  });
+
   if (isPending) {
     return <p>Loader....</p>;
   }
 
-  const onSubmitHandler = () => {
-    // isPending
-  };
+  if (isSaving) {
+    return <p>Saving....</p>;
+  }
 
   return (
     <>
@@ -50,10 +67,19 @@ function PeopleList() {
       </ul>
 
       {editedPerson && (
-        <form onSubmit={onSubmitHandler}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+
+            mutate(editedPerson);
+          }}
+        >
           <label>
             name
-            <input onChange={() => {}} value={editedPerson.name} />
+            <input
+              onChange={(e) => setEditedPerson({ ...editedPerson, name: e.target.value })}
+              value={editedPerson.name}
+            />
           </label>
           <button> Valider </button>
         </form>
