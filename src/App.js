@@ -28,9 +28,14 @@ const usePeople = () => {
 
 function PeopleList() {
   const { isPending, data, next, previous } = usePeople();
+  const [editedPerson, setEditedPerson] = useState();
   if (isPending) {
     return <p>Loader....</p>;
   }
+
+  const onSubmitHandler = () => {
+    // isPending
+  };
 
   return (
     <>
@@ -38,9 +43,21 @@ function PeopleList() {
       <button onClick={() => next()}> Next Page </button>
       <ul>
         {data?.map((d) => (
-          <li>{d.name}</li>
+          <li>
+            <button onClick={() => setEditedPerson(d)}>{d.name}</button>
+          </li>
         ))}{" "}
       </ul>
+
+      {editedPerson && (
+        <form onSubmit={onSubmitHandler}>
+          <label>
+            name
+            <input onChange={() => {}} value={editedPerson.name} />
+          </label>
+          <button> Valider </button>
+        </form>
+      )}
     </>
   );
 }
