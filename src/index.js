@@ -6,7 +6,13 @@ import reportWebVitals from "./reportWebVitals";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
-const client = new QueryClient();
+const client = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+    },
+  },
+});
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
